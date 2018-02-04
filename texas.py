@@ -4,7 +4,7 @@ import texasfunction as tf
 import texas_predict as tp
             
 """初始化牌桌"""
-player_num_init = 6  # 玩家人数
+player_num_init = 2  # 玩家人数
 poke = tf.cards()    # 生成牌桌
 player_list = []    # 生成玩家列表
 for i in range(player_num_init):
@@ -48,8 +48,7 @@ for r in range(1):
     
     # 生成玩家手牌类型
     for i in range(player_num):
-        player_list[i].prepare(cards)
-        player_list[i].cardtype()
+        player_list[i].cardtype(cards)
     # 输出测试
     tf.print_cards(player_list,cards)
     

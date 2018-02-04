@@ -7,17 +7,20 @@ Created on Fri Feb  2 10:07:37 2018
 import random
 import numpy as np
 class usr():
-    drop = 0
-    handcard_type = []
+#    drop = 0
+#    handcard_type = []
     
     def __init__(self,name):
         self.name = name
+        self.drop = 0
+        self.handcard_type = []
+        self.handcard = []
         
     def handcards(self,handcard):
         self.handcard = handcard
     
     """接受底牌序列并将数字转化为花色+牌号"""
-    def prepare(self,cards):
+    def __prepare(self,cards):
         tmp = sorted(cards + self.handcard)
         self.num = [((x-1) % 13 + 1) for x in tmp]
         self.color = [((x-1) // 13) for x in tmp]
@@ -119,7 +122,8 @@ class usr():
         cardking_reverse.reverse()
         return cardorder, cardking_reverse #将牌号顺序转为有小到大
     
-    def cardtype(self):
+    def cardtype(self, cards):
+        self.__prepare(cards)
         cardcolor_list = []  
         """判断是否为同花顺和同花"""
         cardset = {}
@@ -192,7 +196,6 @@ class cards():
 
 class card_predict(cards):
     #继承cards类，用于在texas_predict中生成手牌类
-
     def remove_cards(self,cardlist):
         #用于去掉已经存在的牌
 #        self.cardlist = [x for x in range(1,53) if x not in cardlist]
@@ -210,8 +213,7 @@ class card_predict(cards):
                 [self.cardlist[(2*self.usr_nums+3)]]
         elif card_num == 5:
             return []
-#    def test_len(self):
-#        return self.cardlist
+
                 
     
 def card_trans(card_num,card_color=[], card_type = 10):
@@ -291,8 +293,6 @@ def print_cards(player_list,cards):
     print("此时底牌是:",card_trans(cards))
     print("玩家手牌分别是：")
     for i in range(len(player_list)):
-        player_list[i].prepare(cards)
-        player_list[i].cardtype()
     
         print("玩家" + player_list[i].name + "：", end=' ')
         print(card_types[player_list[i].handcard_type[0]-1], end=' ')

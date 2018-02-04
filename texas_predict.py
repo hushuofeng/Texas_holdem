@@ -6,7 +6,7 @@ Created on Fri Feb  2 10:36:03 2018
 """
 import texasfunction as tf
 import copy
-def predict_all(player_list, cards, repeat_num = 500):
+def predict_all(player_list, cards, repeat_num = 2000):
     """
     当全部玩家的手牌为明牌时，预测每名玩家的获胜概率
     """
@@ -24,15 +24,14 @@ def predict_all(player_list, cards, repeat_num = 500):
         cards_tmp = cards + card_pr.deal(len(cards)) # 记录5张底牌
         # 生成每位玩家手牌
         for i in range(player_num):
-            player_list[i].prepare(cards_tmp)
-            player_list[i].cardtype()
+            player_list[i].cardtype(cards_tmp)
         result = tf.player_rank(player_list[:]) #记录获胜玩家
         for j in range(player_num): #更新每位玩家获胜次数
             if result[j] == 0:
                 result_count[j] += 1
     return [format(x/repeat_num,'.2%') for x in result_count]
 
-def predict_self(player, cards, player_num, repeat_num = 500):
+def predict_self(player, cards, player_num, repeat_num = 2000):
     """
     当只知道player玩家的手牌时，预测该玩家的获胜概率
     """
@@ -46,12 +45,10 @@ def predict_self(player, cards, player_num, repeat_num = 500):
         card_pr.shuffle()   # 洗牌
         card_pr.generate_usr_cardlist(0)   # 生成虚拟玩家手牌
         cards_tmp = cards + card_pr.deal(len(cards)) # 记录5张底牌
-        player.prepare(cards_tmp) # 生成player牌型
-        player.cardtype()
+        player.cardtype(cards_tmp)  #生成player牌型
         for j in range(player_num-1):     # 根据牌桌上玩家个数分发玩家手牌
             player_tmp.handcards(card_pr.usr_cardlist[j]) # 分发虚拟玩家手牌
-            player_tmp.prepare(cards_tmp[:])    # 生成虚拟玩家牌型
-            player_tmp.cardtype()
+            player_tmp.cardtype(cards_tmp[:])   #生成虚拟玩家牌型
             if tf.card_compare(player.handcard_type,player_tmp.handcard_type) == -1:
                 #比较player与虚拟玩家的大小
                 flag = 1
