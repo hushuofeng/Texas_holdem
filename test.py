@@ -4,11 +4,23 @@ Created on Fri Feb  2 19:46:03 2018
 
 @author: hsf
 """
-import texasfunction as tf
-import texas_predict as tp
+#import texasfunction as tf
+#import texas_predict as tp
+#
+#player_tmp1 = tf.usr("robot1")  
+#player_tmp1.handcards([39,40])
+#player_tmp2 = tf.usr("robot2")  
+#player_tmp2.handcards([39,46])
+#player_tmp3 = tf.usr("robot3")  
+#player_tmp3.handcards([39,42])
+#player_tmp3.drop = 1
+#player_tmp2.drop = 1
+#
+#
+#cards=[14,15,16]
+#print(tp.predict_self(player_tmp1, cards, 3, 2, 10))
+#print(tp.predict_all([player_tmp1,player_tmp2,player_tmp3], cards,  10))
 
-player_tmp = tf.usr("robot")  
-player_tmp.handcards([39,23])
-cards=[12,13,14]
-print(tp.predict_self(player_tmp, cards, 6, 10000))
-
+ss = input("input:")
+if ss.isdigit():
+    print('%s%s' % (ss,ss))
