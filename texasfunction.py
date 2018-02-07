@@ -7,14 +7,12 @@ Created on Fri Feb  2 10:07:37 2018
 import random
 import numpy as np
 class usr():
-#    drop = 0
-#    handcard_type = []
-    
     def __init__(self,name):
         self.name = name
         self.drop = 0
         self.handcard_type = []
         self.handcard = []
+        self.handchip = 200
         
     def handcards(self,handcard):
         self.handcard = handcard
@@ -214,7 +212,13 @@ class card_predict(cards):
         elif card_num == 5:
             return []
 
-                
+class chips():
+    def __init__(self):
+        self.chip_num = []
+        self.all_in = []
+    def reset(self, player_num):
+        self.chip_num = [5] * player_num
+        self.all_in = [0] * player_num
     
 def card_trans(card_num,card_color=[], card_type = 10):
     #将卡牌列表转化为poke牌
@@ -301,4 +305,105 @@ def print_cards(player_list,cards):
                          player_list[i].handcard_type[0]), end=' ')
         print("\t底牌：", end=' ')
         print(card_trans(player_list[i].handcard))
+
+def check_raise(player_list, chips, usr_order):
+    player_num = len(player_list)
+    chip_round = [0] * player_num #记录每人加注数量
+    rounds = [0] * player_num #记录每人加注轮数
+    allin = ['','(All In)']
+    flag = True
+    i = usr_order
+    at_last = 0
+    while(flag):
+        at_last += 1
+        i = i % player_num
+        if player_list[i].drop == 1:
+            rounds[i] = max(rounds)
+            if (rounds == [max(rounds)] * player_num) and (at_last >= player_num):
+                flag = False
+            i += 1
+            continue
+        if chips.all_in[i] == 1:
+            rounds[i] = max(rounds)
+            if (rounds == [max(rounds)] * player_num) and (at_last >= player_num):
+                flag = False
+            i += 1
+            continue
+        print('玩家%s：(筹码%s)' % (player_list[i].name, player_list[i].handchip))
+        while(True):
+            chip_last_tmp = 0 #玩家加注，若筹码不足时需要重新加注
+            chip_min = max(chip_round) - chip_round[i]
+            chip_max = sum(chips.chip_num)
+            chip = input("是否加注？(%s ~ %s)\n(加注输入额外的筹码/弃牌输入q/梭哈出入a/跟注输入f/一倍底池输入d）" %\
+                         (chip_min,chip_max))
+            if chip.lower() == 'q':
+                player_list[i].drop = 1
+                chip_last_tmp = 0
+                print('玩家%s弃牌！' % player_list[i].name)
+            elif chip.lower() == 'a':              
+                chip_last_tmp = player_list[i].handchip
+                              
+            elif chip.lower() == 'f':
+                chip_last_tmp = max(chip_round) - chip_round[i]
+                pass
+
+            elif chip.lower() == 'd':
+                chip_last_tmp += sum(chips.chip_num)
+                
+            elif chip.isdigit():
+                chip_last_tmp = int(chip) + max(chip_round) - chip_round[i]
+
+            else:
+                print("请尝试正确输入！")
+                continue
+
+            if chip_last_tmp > player_list[i].handchip:
+                print('你的筹码不足！')
+            elif chip_last_tmp > sum(chips.chip_num):
+                print('加注超过底池筹码！')
+            elif chip_last_tmp == player_list[i].handchip:
+                print('你已经all in！')
+                chips.all_in[i] = 1
+                break
+            else:
+                break
+            
+        sig = chip_last_tmp + chip_round[i] - max(chip_round)
+        if sig > 0:
+            rounds[i] = max(rounds) + 1
+        elif sig <= 0: 
+            rounds[i] = max(rounds)               
+            
+        chips.chip_num[i] += chip_last_tmp
+        chip_round[i] += chip_last_tmp
+        player_list[i].handchip -= chip_last_tmp
+        if chip.lower() != 'q':
+            print(player_list[i].name)
+            print("玩家%s加注%s!%s" % (player_list[i].name, chip_last_tmp, allin[chips.all_in[i]]))
+        """格式化输出"""
+        symbol_num = player_num * 15
+        print('%s' % ('=' * symbol_num))
+        for j in range(player_num):
+            print('%15s' % player_list[j].name, end = '')
+        print('\n')            
+        for j in range(player_num):
+            if player_list[j].drop == 1:
+                print("%15s" % ('(Quit) '+str(chips.chip_num[j])), end = '')
+            elif chips.all_in[j] == 1:
+                print("%15s" % ('(Allin) '+str(chips.chip_num[j])), end = '')
+            else:
+                print("%15s" % str(chips.chip_num[j]), end = '')
+        print('\n%s' % ('=' * symbol_num))
+        print(rounds)
+        """"""
+        if (rounds == [max(rounds)] * player_num) and (at_last >= player_num):
+            flag = False
+        i += 1
+        
+        drop_num = sum([player_list[i].drop for i in range(player_num)])
+        if (player_num - drop_num) == 1:
+            return True
+        
+        
+
     
