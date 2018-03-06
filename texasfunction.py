@@ -217,7 +217,7 @@ class chips():
         self.chip_num = []
         self.all_in = []
     def reset(self, player_num):
-        self.chip_num = [5] * player_num
+        self.chip_num = [0] * player_num
         self.all_in = [0] * player_num
     
 def card_trans(card_num,card_color=[], card_type = 10):
@@ -306,7 +306,7 @@ def print_cards(player_list,cards):
         print("\t底牌：", end=' ')
         print(card_trans(player_list[i].handcard))
 
-def check_raise(player_list, chips, usr_order):
+def check_raise(player_list, chips, usr_order, first_round = 0):
     player_num = len(player_list)
     chip_round = [0] * player_num #记录每人加注数量
     rounds = [0] * player_num #记录每人加注轮数
@@ -314,6 +314,18 @@ def check_raise(player_list, chips, usr_order):
     flag = True
     i = usr_order
     at_last = 0
+    if first_round == 1:
+        chip_round[i] = 5
+        chips.chip_num[i] = 5
+        chip_round[i+1] = 10
+        chips.chip_num[i+1] = 10
+        player_list[i].handchip -= 5
+        player_list[i+1].handchip -= 10
+        rounds[i] = 1
+        rounds[i+1] = 2
+        i += 2
+        at_last += 2
+    
     while(flag):
         at_last += 1
         i = i % player_num
@@ -403,7 +415,53 @@ def check_raise(player_list, chips, usr_order):
         drop_num = sum([player_list[i].drop for i in range(player_num)])
         if (player_num - drop_num) == 1:
             return True
-        
+ 
+def chip_balance(player_list,chips):
+    player_num = len(player_list)
+    result = player_rank(player_list[:])
+    for i in range(player_num):
+        if player_list[i].drop == 1:
+            result[i] = max(result) + 1
+    sumchips = 0
+    for i in range(max(result)+1):
+        if sum(chips.chip_num) == 0:
+            break
+        else:
+            tmp = result.count(i)
+            win = []
+            for j in range(tmp):
+                k_min = 0
+                for k in range(len(result)):
+                    if (result[k] == i) and (k not in win):
+                        if result[k_min] != i:
+                            k_min = k
+                        elif chips.chip_num[k] < chips.chip_num[k_min]:
+                            k_min = k
+                win.append(k_min)
+                chip_min = chips.chip_num[k_min]
+                for m in range(len(result)):
+                    if chips.chip_num[m] <= chip_min:
+                        sumchips += chips.chip_num[m]
+                        chips.chip_num[m] = 0
+                    else:
+                        sumchips += chip_min
+                        chips.chip_num[m] -= chip_min
+                sumchips_div = round(sumchips / (tmp - j))
+                player_list[k_min].handchip += sumchips_div
+                sumchips -= sumchips_div
+                print("玩家%s获胜！ 赢得%d筹码！" % \
+                      (player_list[k_min].name,sumchips_div))
+def print_chips(player_list):
+    player_num = len(player_list)
+    symbol_num = player_num * 15
+    print('%s' % ('=' * symbol_num))
+    for j in range(player_num):
+        print('%15s' % player_list[j].name, end = '')
+    print('\n')            
+    for j in range(player_num):
+        print("%15s" % player_list[j].handchip, end = '')
+    print('\n%s' % ('=' * symbol_num))
+       
         
 
     

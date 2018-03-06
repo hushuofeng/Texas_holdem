@@ -4,7 +4,7 @@ import texasfunction as tf
 import texas_predict as tp
             
 """初始化牌桌"""
-player_num_init = 3  # 玩家人数
+player_num_init = 4  # 玩家人数
 poke = tf.cards()    # 生成牌桌
 player_list = []    # 生成玩家列表
 for i in range(player_num_init):
@@ -29,17 +29,21 @@ for r in range(1):
     chips = tf.chips()
     chips.reset(player_num)
     # 第〇轮
+    print("第〇轮加注开始：")
     card_deal = poke.deal()     # 发牌
     #加注
-    flag_drop = tf.check_raise(player_list,chips,r % player_num)
+    flag_drop = tf.check_raise(player_list,chips,r % player_num, 1)
     if flag_drop:
         for i in range(player_num):
             if player_list[i].drop == 0:
-                print("玩家" + player_list[i].name + "获胜！")
+                player_list[i].handchip += sum(chips.chip_num)
+                print("玩家%s获胜！ 赢得%d筹码！" % \
+                      (player_list[i].name,sum(chips.chip_num)))
         continue
 #    tp.predict_result(player_list, cards)
     
     # 第一轮，发三张牌发第一轮三张牌
+    print("第一轮加注开始：")
     cards = next(card_deal)
     #加注
     flag_drop = tf.check_raise(player_list,chips,r % player_num)
@@ -47,11 +51,13 @@ for r in range(1):
         for i in range(player_num):
             if player_list[i].drop == 0:
                 player_list[i].handchip += sum(chips.chip_num)
-                print("玩家" + player_list[i].name + "获胜！")
+                print("玩家%s获胜！ 赢得%d筹码！" % \
+                      (player_list[i].name,sum(chips.chip_num)))
         continue
 #    tp.predict_result(player_list, cards)
     
     # 第二轮，发一张牌
+    print("第二轮加注开始：")
     cards.append(next(card_deal))
     #加注
     flag_drop = tf.check_raise(player_list,chips,r % player_num)
@@ -59,11 +65,13 @@ for r in range(1):
         for i in range(player_num):
             if player_list[i].drop == 0:
                 player_list[i].handchip += sum(chips.chip_num)
-                print("玩家" + player_list[i].name + "获胜！")
+                print("玩家%s获胜！ 赢得%d筹码！" % \
+                      (player_list[i].name,sum(chips.chip_num)))
         continue
 #    tp.predict_result(player_list, cards)
     
     # 第三轮，发一张牌
+    print("第三轮加注开始：")
     cards.append(next(card_deal))
     #加注
     flag_drop = tf.check_raise(player_list,chips,r % player_num)
@@ -71,7 +79,8 @@ for r in range(1):
         for i in range(player_num):
             if player_list[i].drop == 0:
                 player_list[i].handchip += sum(chips.chip_num)
-                print("玩家" + player_list[i].name + "获胜！")
+                print("玩家%s获胜！ 赢得%d筹码！" % \
+                      (player_list[i].name,sum(chips.chip_num)))
         continue
 #    tp.predict_result(player_list, cards)
     
@@ -80,21 +89,14 @@ for r in range(1):
         player_list[i].cardtype(cards)
     # 输出测试
     tf.print_cards(player_list,cards)
+    tf.chip_balance(player_list,chips)
+    tf.print_chips(player_list)
     
-    result = tf.player_rank(player_list[:])
-    for i in range(player_num):
-        if player_list[i].drop == 1:
-            result[i] = max(result) + 1
     
-    for i in range(max(result)):
-        if sum(chips.chip_num) == 0:
-            break
-        else:
-            for j in range(len(result)):
-                tmp = result.count(j)
-                if result[j] == i:
-                    print("玩家" + player_list[j].name + "获胜！")
-                    if chips.all_in[j] == 1:
+                
+                
+                
+                        
                     
 
             
